@@ -5,7 +5,6 @@
   const colorDiscount = scriptTag.getAttribute('data-color-discount') || '#29C87B';
   const bgLabel = scriptTag.getAttribute('data-background-label-color') || '#e0f9ed';
 
-  // Crear contenedor visual
   const container = document.createElement('div');
   container.style.margin = '20px 0';
   container.className = 'emapps-discount-radio-group';
@@ -72,15 +71,13 @@
     container.appendChild(option);
   });
 
-  // Insertar debajo del precio del producto (ajustá el selector si cambia)
+  // 🔥 INSERCIÓN AUTOMÁTICA BAJO EL PRECIO
   document.addEventListener('DOMContentLoaded', () => {
-    const priceSection = document.querySelector('.product-price, .price-box, .product__price, .price__container');
+    const priceSection = document.querySelector('.product__price');
     if (priceSection) {
       priceSection.insertAdjacentElement('afterend', container);
     } else {
-      // fallback: insertarlo donde está el script
       scriptTag.parentNode.insertBefore(container, scriptTag);
     }
   });
 })();
-
