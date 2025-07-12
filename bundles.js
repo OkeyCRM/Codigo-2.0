@@ -5,15 +5,17 @@
   const colorDiscount = scriptTag.getAttribute('data-color-discount') || '#29C87B';
   const bgLabel = scriptTag.getAttribute('data-background-label-color') || '#e0f9ed';
 
+  // Crear contenedor visual
   const container = document.createElement('div');
   container.style.margin = '20px 0';
   container.className = 'emapps-discount-radio-group';
 
   const title = document.createElement('div');
   title.className = 'emapps-discount-radio-group-title';
-  title.textContent = 'Elegí tu pack:';
+  title.textContent = '⏰ POR TIEMPO LIMITADO ⏰';
   title.style.fontWeight = 'bold';
   title.style.marginBottom = '10px';
+  title.style.textAlign = 'center';
   container.appendChild(title);
 
   discounts.forEach((bundle, index) => {
@@ -70,5 +72,15 @@
     container.appendChild(option);
   });
 
-  scriptTag.parentNode.insertBefore(container, scriptTag);
+  // Insertar debajo del precio del producto (ajustá el selector si cambia)
+  document.addEventListener('DOMContentLoaded', () => {
+    const priceSection = document.querySelector('.product-price, .price-box, .product__price, .price__container');
+    if (priceSection) {
+      priceSection.insertAdjacentElement('afterend', container);
+    } else {
+      // fallback: insertarlo donde está el script
+      scriptTag.parentNode.insertBefore(container, scriptTag);
+    }
+  });
 })();
+
