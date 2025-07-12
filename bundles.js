@@ -17,7 +17,7 @@
   title.style.textAlign = 'center';
   container.appendChild(title);
 
-  discounts.forEach((bundle, index) => {
+  discounts.forEach((bundle) => {
     const option = document.createElement('label');
     option.style.display = 'block';
     option.style.border = `2px solid ${bundle.default ? colorBorder : '#ccc'}`;
@@ -71,13 +71,14 @@
     container.appendChild(option);
   });
 
-  // 🔥 INSERCIÓN AUTOMÁTICA BAJO EL PRECIO
+  // Tiendanube: insertar debajo del precio real
   document.addEventListener('DOMContentLoaded', () => {
-    const priceSection = document.querySelector('.product__price');
-    if (priceSection) {
-      priceSection.insertAdjacentElement('afterend', container);
+    const priceArea = document.querySelector('.product-price, .product__price, .product-prices'); // probados en Tiendanube
+    if (priceArea) {
+      priceArea.insertAdjacentElement('afterend', container);
     } else {
-      scriptTag.parentNode.insertBefore(container, scriptTag);
+      scriptTag.parentNode.insertBefore(container, scriptTag); // fallback
     }
   });
 })();
+
