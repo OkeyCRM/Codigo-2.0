@@ -1,7 +1,7 @@
-
 const colorBorder = document.currentScript.getAttribute('data-color-border');
 const colorDiscount = document.currentScript.getAttribute('data-color-discount');
 const backgroundLabelColor = document.currentScript.getAttribute('data-background-label-color');
+const discounts = JSON.parse(document.currentScript.getAttribute('data-discounts'));
 
 const styleBundles = document.createElement('style');
 styleBundles.textContent = `
@@ -14,8 +14,6 @@ styleBundles.textContent = `
     font-size: 1.2rem;
     font-weight: bold;
     margin-bottom: 10px;
-    text-align: center;
-    color: #003366;
   }
   .emapps-discount-radio-group-list {
     display: flex;
@@ -37,20 +35,20 @@ styleBundles.textContent = `
     margin-right: 10px;
   }
   .emapps-discount-radio-group-list-item-active {
-    border: 2px solid ${colorBorder ? colorBorder : '#29C87B'};
+    border: 2px solid ${colorBorder || '#8c52ff'};
     box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.2);
   }
   .emapps-discount-radio-group-list-item-qty-info-unit {
     font-weight: bold;
   }
-  .emapps-discount-radio-group-list-item-qty-info-percent {
+  .emapps-discount-radio-group-list-item-qty-info-texto {
     font-size: 0.9em;
     color: #666;
   }
   .emapps-discount-radio-group-list-item-qty-price-de {
     text-decoration: line-through;
     font-size: 0.85em;
-    color: ${colorDiscount ? colorDiscount : '#8c52ff'};
+    color: ${colorDiscount || '#8c52ff'};
   }
   .emapps-discount-radio-group-list-item-qty-price-por {
     font-weight: bold;
@@ -60,7 +58,7 @@ styleBundles.textContent = `
     position: absolute;
     top: -10px;
     right: 10px;
-    background: ${backgroundLabelColor ? backgroundLabelColor : '#29C87B'};
+    background: ${backgroundLabelColor || '#8c52ff'};
     color: white;
     font-weight: bold;
     font-size: 0.75rem;
@@ -70,14 +68,13 @@ styleBundles.textContent = `
 `;
 document.head.appendChild(styleBundles);
 
-const containerBundle = document.querySelector('.product-price, .product__price, .product-prices');
-const discounts = JSON.parse(document.currentScript.getAttribute('data-discounts'));
+const containerBundle = document.querySelector('.product-info .price-container') || document.querySelector('.price-container');
 const wrapper = document.createElement('div');
 wrapper.className = 'emapps-discount-radio-group';
 
 const title = document.createElement('h4');
 title.className = 'emapps-discount-radio-group-title';
-title.textContent = '⏰ POR TIEMPO LIMITADO ⏰';
+title.textContent = '¡GANÁ COMPRANDO POR CANTIDAD!';
 wrapper.appendChild(title);
 
 const list = document.createElement('div');
@@ -97,18 +94,20 @@ discounts.forEach((discount) => {
   const qtyInfo = document.createElement('div');
   const unit = document.createElement('div');
   unit.className = 'emapps-discount-radio-group-list-item-qty-info-unit';
-  unit.textContent = discount.name;
-  const percent = document.createElement('div');
-  percent.className = 'emapps-discount-radio-group-list-item-qty-info-percent';
-  percent.textContent = discount.text || '';
+  unit.textContent = discount.name || `${discount.quantity} unidades`;
+
+  const textoLibre = document.createElement('div');
+  textoLibre.className = 'emapps-discount-radio-group-list-item-qty-info-texto';
+  textoLibre.textContent = discount.text || ''; // Texto editable en HTML
 
   qtyInfo.appendChild(unit);
-  qtyInfo.appendChild(percent);
+  qtyInfo.appendChild(textoLibre);
 
   const priceBox = document.createElement('div');
   const priceDe = document.createElement('div');
   priceDe.className = 'emapps-discount-radio-group-list-item-qty-price-de';
   priceDe.textContent = `$ ${discount.priceOriginal}`;
+
   const pricePor = document.createElement('div');
   pricePor.className = 'emapps-discount-radio-group-list-item-qty-price-por';
   pricePor.textContent = `$ ${discount.priceFinal}`;
@@ -120,10 +119,10 @@ discounts.forEach((discount) => {
   item.appendChild(qtyInfo);
   item.appendChild(priceBox);
 
-  if (discount.default) {
+  if (discount.label && discount.default) {
     const badge = document.createElement('div');
     badge.className = 'emapps-discount-radio-group-list-item-default-discount';
-    badge.textContent = 'Mas comprado!';
+    badge.textContent = discount.label;
     item.appendChild(badge);
   }
 
@@ -134,11 +133,12 @@ discounts.forEach((discount) => {
     });
     item.classList.add('emapps-discount-radio-group-list-item-active');
     radio.checked = true;
-    document.querySelector('.js-quantity-input')?.value = item.firstChild.value;
+    const qtyInput = document.querySelector('.js-quantity-input');
+    if (qtyInput) qtyInput.value = item.firstChild.value;
   });
 
   list.appendChild(item);
 });
 
 wrapper.appendChild(list);
-containerBundle?.appendChild(wrapper);
+if (containerBundle) containerBundle.prepend(wrapper);
