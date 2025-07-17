@@ -1,0 +1,55 @@
+
+/* Contenedor principal */
+.finger-flex-box {
+  max-width: 450px;
+  margin: auto;
+  font-family: sans-serif;
+  background: linear-gradient(to bottom, #B38CB4, #ffffff);
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Imagen superior de impacto */
+.finger-flex-box .impact-image {
+  width: 100%;
+  border-radius: 15px;
+  margin-bottom: 15px;
+}
+
+/* Hook grande */
+.finger-flex-box h2 {
+  color: #7F4C8A;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 0 10px;
+}
+
+/* Explicación corta */
+.finger-flex-box p {
+  color: #333;
+  font-size: 15px;
+  margin: 0 0 20px;
+}
+
+/* Nombre del producto (etiqueta estilo botón) */
+.finger-flex-box .product-name {
+  display: inline-block;
+  background-color: #7F4C8A;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: bold;
+  font-size: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  margin-bottom: 20px;
+}
+
+/* Imagen inferior del producto colocado */
+.finger-flex-box .product-image {
+  width: 100%;
+  border-radius: 15px;
+  margin-top: 15px;
+}
