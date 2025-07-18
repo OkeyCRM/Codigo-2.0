@@ -113,3 +113,46 @@ style.innerHTML = `
   }
 `;
 document.head.appendChild(style);
+/* BLOQUE CTA CON BOTÓN DE COMPRA */
+.ff-cta-box {
+  max-width: 420px;
+  margin: 0 auto 40px;
+  text-align: center;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+.ff-cta-img {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+}
+
+.ff-cta-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #145A32;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
+
+.ff-btn-shake {
+  background-color: #145A32;
+  color: white;
+  border: none;
+  padding: 14px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  cursor: pointer;
+  animation: shake 1.5s infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
