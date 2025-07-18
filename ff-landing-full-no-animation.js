@@ -148,3 +148,62 @@ style.innerHTML = `
   }
 `;
 document.head.appendChild(style);
+// ESTILOS FUNCIONAMIENTO FINGER FLEX
+const style = document.createElement('style');
+style.innerHTML = `
+  /* BLOQUE FUNCIONAMIENTO FINGER FLEX CON SOMBRA */
+  .ff-funciona-box {
+    max-width: 500px;
+    margin: 0 auto 40px;
+    padding: 25px 20px;
+    border: 2px solid #145A32;
+    border-radius: 18px;
+    font-family: 'Helvetica Neue', sans-serif;
+    color: #145A32;
+    background-color: #ffffff;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1); /* Sombra añadida */
+  }
+
+  .ff-funciona-title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 25px;
+  }
+
+  .ff-funciona-contenido {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .ff-funciona-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .ff-funciona-icono {
+    width: 48px;
+    height: 48px;
+  }
+
+  .ff-funciona-subtitulo {
+    background-color: #145A32;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 8px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .ff-funciona-texto p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+  }
+`;
+document.head.appendChild(style);
+
