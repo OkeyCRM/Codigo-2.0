@@ -1,17 +1,14 @@
-/* upsells-ml-card.js – Tienda Nube Upsells (estética ML exacta, funciones conservadas)
-   Lee el atributo data-prducts-to-upssell (mismo nombre/typo que tu script original),
-   renderiza las tarjetas y agrega al carrito con idProducto.
+/* upsells-ml-card.js v1.1 – Upsells Tienda Nube (carrito + estética del mock)
+   - Lee data-prducts-to-upssell (mismo nombre/typo).
+   - Inserta en el carrito (busca contenedores TN) o fallback tras el <script>.
+   - “+” translúcido; viejo arriba del nuevo; cuadrado verde con descuento a la derecha.
 */
 (function () {
-  const scripts = document.querySelectorAll('script[data-prducts-to-upssell]');
-  if (!scripts.length) return;
+  const blocks = document.querySelectorAll('script[data-prducts-to-upssell]');
+  if (!blocks.length) return;
 
-  // Formato ARS
-  const fmtARS = new Intl.NumberFormat('es-AR', {
-    style: 'currency', currency: 'ARS', maximumFractionDigits: 0
-  });
+  const fmtARS = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
 
-  // Íconos inline
   const SVG_PLUS = `
     <svg viewBox="0 0 24 24" aria-hidden="true" class="ba-upsells-plus-icon">
       <path d="M11 5a1 1 0 0 1 2 0v6h6a1 1 0 1 1 0 2h-6v6a1 1 0 1 1-2 0v-6H5a1 1 0 1 1 0-2h6V5z"></path>
@@ -21,10 +18,26 @@
       <path d="M11 21h-1l1-7H7l6-11h1l-1 7h4l-6 11z"></path>
     </svg>`;
 
-  // Agregar al carrito (intenta endpoint ajax → fallback form POST)
+  // Inserción en carrito (busca contenedores comunes de TN / themes)
+  function findCartMount() {
+    const selectors = [
+      '.js-cart-products',            // muy común
+      '.cart-products',               // variantes
+      '.cart__products',              // themes nuevos
+      '.mini-cart__content',          // mini cart / drawer
+      '.js-minicart-products',
+      '#cart .container',             // página /cart
+      '#cart', '.cart-content', '.cart-items'
+    ];
+    for (const s of selectors) {
+      const el = document.querySelector(s);
+      if (el) return el;
+    }
+    return null;
+  }
+
   async function addToCartTN(variantId, qty) {
     qty = qty || 1;
-    // 1) /cart/add.js (si el theme lo expone)
     try {
       const res = await fetch('/cart/add.js', {
         method: 'POST',
@@ -33,132 +46,119 @@
         credentials: 'same-origin'
       });
       if (res.ok) return true;
-    } catch (_) {}
-
-    // 2) Fallback POST clásico a /cart
+    } catch (e) {}
     try {
       const form = document.createElement('form');
       form.action = '/cart';
       form.method = 'POST';
       form.style.display = 'none';
-
-      const inputId = document.createElement('input');
-      inputId.name = 'product_id';
-      inputId.value = String(variantId);
-
-      const inputQty = document.createElement('input');
-      inputQty.name = 'quantity';
-      inputQty.value = String(qty);
-
-      const inputAction = document.createElement('input');
-      inputAction.name = 'add_to_cart';
-      inputAction.value = 'true';
-
-      form.appendChild(inputId);
-      form.appendChild(inputQty);
-      form.appendChild(inputAction);
+      const idI = document.createElement('input');
+      idI.name = 'product_id'; idI.value = String(variantId);
+      const qI  = document.createElement('input');
+      qI.name = 'quantity'; qI.value = String(qty);
+      const aI  = document.createElement('input');
+      aI.name = 'add_to_cart'; aI.value = 'true';
+      form.append(idI, qI, aI);
       document.body.appendChild(form);
       form.submit();
       return true;
-    } catch (_) {
-      return false;
-    }
+    } catch (e) { return false; }
   }
 
-  function render(container, products) {
-    const wrap = document.createElement('div');
+  function render(targetAfter, products) {
+    const wrap = document.createElement('section');
     wrap.className = 'ba-upsells';
-    const list = document.createElement('div');
-    list.className = 'ba-upsells-row';
-    wrap.appendChild(list);
 
-    products.forEach((p) => {
+    const title = document.createElement('h4');
+    title.className = 'ba-upsells-title';
+    title.textContent = 'Productos que te interesaron';
+    wrap.appendChild(title);
+
+    const row = document.createElement('div');
+    row.className = 'ba-upsells-row';
+    wrap.appendChild(row);
+
+    products.forEach(p => {
       const name = p.name || '';
-      const img = p.img || '';
-      const oldPrice = typeof p.oldPrice === 'number' ? p.oldPrice : null;
-      const newPrice = typeof p.newPrice === 'number' ? p.newPrice : null;
-      const discount = p.discount || '';
-      const idVar = p.idProducto || p.id_variant || p.variant_id || null;
-      const link = p.url || '#';
+      const img  = p.img  || '';
+      const oldP = typeof p.oldPrice === 'number' ? p.oldPrice : null;
+      const newP = typeof p.newPrice === 'number' ? p.newPrice : null;
+      const disc = p.discount || ''; // ej.: "33% OFF"
+      const id   = p.idProducto || p.id_variant || p.variant_id || null;
+      const url  = p.url || '#';
 
       const card = document.createElement('article');
       card.className = 'ba-upsells-card';
 
-      // Foto
       const photo = document.createElement('a');
+      photo.href = url; photo.rel = 'noopener';
       photo.className = 'ba-upsells-photo';
-      photo.href = link;
-      photo.rel = 'noopener';
       photo.innerHTML = `<img loading="lazy" decoding="async" src="${img}" alt="${name}">`;
 
-      // Botón +
       const add = document.createElement('button');
-      add.type = 'button';
-      add.className = 'ba-upsells-add';
+      add.type = 'button'; add.className = 'ba-upsells-add';
       add.innerHTML = SVG_PLUS;
-      add.addEventListener('click', async (ev) => {
-        ev.preventDefault();
-        if (idVar) {
+      add.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (id) {
           add.classList.add('is-loading');
-          const ok = await addToCartTN(idVar, 1);
+          const ok = await addToCartTN(id, 1);
           add.classList.remove('is-loading');
-          if (!ok && link && link !== '#') window.location.href = link;
-        } else if (link && link !== '#') {
-          window.location.href = link;
+          if (!ok && url && url !== '#') window.location.href = url;
+        } else if (url && url !== '#') {
+          window.location.href = url;
         }
       });
-
       photo.appendChild(add);
 
-      // Info
       const info = document.createElement('div');
       info.className = 'ba-upsells-info';
-      info.innerHTML = `<h3 class="ba-upsells-name" title="${name}">${name}</h3>`;
 
-      // Precios
+      const h3 = document.createElement('h3');
+      h3.className = 'ba-upsells-name';
+      h3.textContent = name;
+      info.appendChild(h3);
+
+      // Bloque de precios: izquierda (viejo arriba / nuevo grande) + derecha (cuadrado)
       const prices = document.createElement('div');
       prices.className = 'ba-upsells-prices';
 
-      const oldP = document.createElement('div');
-      oldP.className = 'ba-upsells-old';
-      oldP.textContent = oldPrice != null ? fmtARS.format(oldPrice) : '';
+      const left = document.createElement('div');
+      left.className = 'ba-upsells-price-left';
+      left.innerHTML = `
+        <div class="ba-upsells-old">${oldP != null ? fmtARS.format(oldP) : ''}</div>
+        <div class="ba-upsells-main">${newP != null ? fmtARS.format(newP) : ''}</div>
+      `;
 
-      const mainP = document.createElement('div');
-      mainP.className = 'ba-upsells-main';
-      mainP.textContent = newPrice != null ? fmtARS.format(newPrice) : '';
+      const right = document.createElement('div');
+      right.className = 'ba-upsells-discount-box';
+      right.textContent = disc || '';
 
-      const pill = document.createElement('span');
-      pill.className = 'ba-upsells-pill';
-      pill.textContent = discount || '';
+      prices.append(left, right);
+      info.appendChild(prices);
 
-      prices.appendChild(oldP);
-      prices.appendChild(mainP);
-      prices.appendChild(pill);
-
-      // Envíos
       const ship = document.createElement('div');
       ship.className = 'ba-upsells-ship';
       ship.innerHTML = `${SVG_BOLT}<span>ENVÍOS EN 24HS</span>`;
-
-      info.appendChild(prices);
       info.appendChild(ship);
 
-      card.appendChild(photo);
-      card.appendChild(info);
-      list.appendChild(card);
+      card.append(photo, info);
+      row.appendChild(card);
     });
 
-    container.parentNode.insertBefore(wrap, container.nextSibling);
+    // Preferir carrito; si no existe, fallback tras el <script>
+    const cartMount = findCartMount();
+    if (cartMount) {
+      cartMount.appendChild(wrap);
+    } else {
+      targetAfter.parentNode.insertBefore(wrap, targetAfter.nextSibling);
+    }
   }
 
-  // Procesa cada bloque <script data-prducts-to-upssell="[...]">
-  scripts.forEach((sc) => {
+  blocks.forEach(sc => {
     let products = [];
-    try {
-      const raw = sc.getAttribute('data-prducts-to-upssell') || '[]';
-      products = JSON.parse(raw);
-    } catch (_) { products = []; }
-    if (!Array.isArray(products) || !products.length) return;
-    render(sc, products);
+    try { products = JSON.parse(sc.getAttribute('data-prducts-to-upssell') || '[]'); }
+    catch (e) { products = []; }
+    if (products && products.length) render(sc, products);
   });
 })();
